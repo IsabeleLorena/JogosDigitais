@@ -1,5 +1,13 @@
 import processing.sound.*;
 import java.util.ArrayList;
+import controlP5.*;
+
+ControlP5 cp5;
+Button startButton;
+Button creditosButton;
+Button instrucoesButton;
+Button historiaButton;
+Button voltarButton;
 
 PImage nave;
 PImage[] asteroides = new PImage[3];
@@ -24,8 +32,32 @@ ArrayList<Asteroide> listaAsteroides = new ArrayList<Asteroide>();
 
 void setup() {
   size(800, 600);
+  cp5 = new ControlP5(this);
+  startButton = cp5.addButton("startButton")
+                   .setPosition(width/2 - 75, height/2)
+                   .setSize(150, 50)
+                   .setCaptionLabel("Start Game");
+  creditosButton = cp5.addButton("creditosButton")
+                     .setPosition(width/2 - 75, height/2 + 60)
+                     .setSize(150, 50)
+                     .setCaptionLabel("Créditos");
+  instrucoesButton = cp5.addButton("instrucoesButton")
+                     .setPosition(width/2 - 75, height/2 + 120)
+                     .setSize(150, 50)
+                     .setCaptionLabel("Instruções");
+  historiaButton = cp5.addButton("historiaButton")
+                     .setPosition(width/2 - 75, height/2 + 180)
+                     .setSize(150, 50)
+                     .setCaptionLabel("História");
+
+  voltarButton = cp5.addButton("voltarButton")
+                    .setPosition(width/2 - 75, height/2 + 240)
+                    .setSize(150, 50)
+                    .setCaptionLabel("Voltar")
+                    .hide();
+
   somInicio = new SoundFile(this, "tiro.mp3");
-  somPerder = new SoundFile(this, "explosaor.mp3");
+  somPerder = new SoundFile(this, "explosao.mp3");
   nave = loadImage("Fighter_09.png");
   asteroides[0] = loadImage("asteroide1.png");
   asteroides[1] = loadImage("asteroide2.png");
@@ -44,17 +76,64 @@ void draw() {
     instrucoes();
   } else if (tela == 3) {
     creditos();
+  } else if (tela == 4) {
+    historia();
   }
 }
 
 void menuInicial() {
-  background(corFundo);
+  background(planoDeFundo); // Alterando o fundo para a imagem do jogo
   fill(255);
   textSize(24);
   textAlign(CENTER, CENTER);
   text("Asteroides: A Missão Estelar", width/2, height/2 - 50);
-  textSize(16);
-  text("Pressione 'Espaço' para iniciar", width/2, height/2 + 50);
+  startButton.show();
+  creditosButton.show();
+  instrucoesButton.show();
+  historiaButton.show();
+  voltarButton.hide();
+}
+
+void startButton() {
+  iniciarJogo();
+}
+
+void creditosButton() {
+  tela = 3;
+  startButton.hide();
+  creditosButton.hide();
+  instrucoesButton.hide();
+  historiaButton.hide();
+  voltarButton.setPosition(width/2 - 75, height/2 + 240); // Ajustar a posição do botão Voltar
+  voltarButton.show();
+}
+
+void instrucoesButton() {
+  tela = 2;
+  startButton.hide();
+  creditosButton.hide();
+  instrucoesButton.hide();
+  historiaButton.hide();
+  voltarButton.setPosition(width/2 - 75, height/2 + 240); // Ajustar a posição do botão Voltar
+  voltarButton.show();
+}
+
+void historiaButton() {
+  tela = 4;
+  startButton.hide();
+  creditosButton.hide();
+  instrucoesButton.hide();
+  historiaButton.hide();
+  voltarButton.setPosition(width/2 - 75, height/2 + 240); // Ajustar a posição do botão Voltar
+  voltarButton.show();
+}
+
+void voltarButton() {
+  tela = 0;
+  startButton.show();
+  creditosButton.show();
+  instrucoesButton.show();
+  historiaButton.show();
 }
 
 void iniciarJogo() {
@@ -62,6 +141,11 @@ void iniciarJogo() {
   pontuacao = 0;
   vidas = 3;
   somInicio.play();
+  startButton.hide();
+  creditosButton.hide();
+  instrucoesButton.hide();
+  historiaButton.hide();
+  voltarButton.hide();
 }
 
 void jogo() {
@@ -125,8 +209,14 @@ void verificarColisao() {
       listaAsteroides.remove(i);
       vidas--;
       somPerder.play();
-      if (vidas == 0) {
-        tela = 0;
+      // Voltando a imagem da nave
+      naveX = width / 2;
+      naveY = height / 2;
+      // Tocando o som de explosão
+      somPerder.play();
+      // Ajuste para evitar vidas negativas
+      if (vidas < 0) {
+        vidas = 0;
       }
     }
   }
@@ -170,6 +260,21 @@ void creditos() {
   text("[Nome do Desenvolvedor 1]", width/2, height/2);
   text("[Nome do Desenvolvedor 2]", width/2, height/2 + 50);
   text("[Nome do Desenvolvedor 3]", width/2, height/2 + 100);
+  text("[Nome do Desenvolvedor 4]", width/2, height/2 + 150);
+}
+
+void historia() {
+  background(corFundo);
+  fill(255);
+  textSize(24);
+  textAlign(CENTER, CENTER);
+  text("História", width/2, height/2 - 100);
+  textSize(16);
+  text("Em um futuro distante, a Terra está sob ataque constante", width/2, height/2 - 50);
+  text("de asteroides. Você, como o piloto da nave estelar", width/2, height/2);
+  text("mais avançada, é a última esperança para proteger", width/2, height/2 + 50);
+  text("nosso planeta. Sua missão é destruir todos os asteroides", width/2, height/2 + 100);
+  text("antes que eles atinjam a Terra. Boa sorte, piloto!", width/2, height/2 + 150);
 }
 
 void keyPressed() {
@@ -178,6 +283,17 @@ void keyPressed() {
   }
   if (key == ' ' && tela == 2) {
     tela = 0;
+    startButton.show();
+    creditosButton.show();
+    instrucoesButton.show();
+    historiaButton.show();
+  }
+  if (key == ' ' && tela == 4) {
+    tela = 0;
+    startButton.show();
+    creditosButton.show();
+    instrucoesButton.show();
+    historiaButton.show();
   }
 }
 
