@@ -9,8 +9,12 @@ Button instrucoesButton;
 Button historiaButton;
 Button voltarButton;
 Button restartButton;
+Button nave1Button;
+Button nave2Button;
 
-PImage nave;
+PImage nave1;
+PImage nave2;
+PImage naveSelecionada;
 PImage[] asteroides = new PImage[3];
 PImage explosao;
 PImage planoDeFundo;
@@ -66,11 +70,24 @@ void setup() {
                     .setCaptionLabel("Restart")
                     .hide();
 
+  nave1Button = cp5.addButton("nave1Button")
+                   .setPosition(width/2 - 75, height/2 - 120)
+                   .setSize(150, 50)
+                   .setCaptionLabel("Nave 1");
+
+  nave2Button = cp5.addButton("nave2Button")
+                   .setPosition(width/2 - 75, height/2 - 60)
+                   .setSize(150, 50)
+                   .setCaptionLabel("Nave 2");
+
   somInicio = new SoundFile(this, "tiro.mp3");
   somPerder = new SoundFile(this, "explosao.mp3");
   somDisparo = new SoundFile(this, "tiro.mp3");
 
-  nave = loadImage("Fighter_09.png");
+  nave1 = loadImage("Fighter_09.png");
+  nave2 = loadImage("nave.png");
+  naveSelecionada = nave1; // Nave padrão
+
   asteroides[0] = loadImage("asteroide1.png");
   asteroides[1] = loadImage("asteroide2.png");
   asteroides[2] = loadImage("asteroide3.png");
@@ -116,6 +133,8 @@ void menuInicial() {
   historiaButton.show();
   voltarButton.hide();
   restartButton.hide();
+  nave1Button.show();
+  nave2Button.show();
 }
 
 void startButton() {
@@ -130,6 +149,8 @@ void creditosButton() {
   historiaButton.hide();
   voltarButton.setPosition(width/2 - 75, height/2 + 240);
   voltarButton.show();
+  nave1Button.hide();
+  nave2Button.hide();
 }
 
 void instrucoesButton() {
@@ -140,6 +161,43 @@ void instrucoesButton() {
   historiaButton.hide();
   voltarButton.setPosition(width/2 - 75, height/2 + 240);
   voltarButton.show();
+  nave1Button.hide();
+  nave2Button.hide();
+}
+void instrucoes() {
+  background(planoDeFundo);
+  fill(255);
+  textSize(24);
+  textAlign(CENTER, CENTER);
+  text("Instruções do Jogo", width / 2, height / 2 - 100);
+  text("1. Use as setas do teclado para mover a nave.", width / 2, height / 2 - 60);
+  text("2. Pressione a barra de espaço para disparar lasers.", width / 2, height / 2 - 20);
+  text("3. Desvie dos asteroides e destrua-os para ganhar pontos.", width / 2, height / 2 + 20);
+  text("4. Cada 100 pontos, você sobe de nível e os asteroides ficam mais rápidos.", width / 2, height / 2 + 60);
+  text("5. Você começa com 3 vidas. Se todas as vidas acabarem, o jogo termina.", width / 2, height / 2 + 100);
+}
+void creditos() {
+  background(planoDeFundo);
+  fill(255);
+  textSize(24);
+  textAlign(CENTER, CENTER);
+  text("Créditos", width / 2, height / 2 - 100);
+  text("Beatriz", width / 2, height / 2 - 60);
+  text("Jean", width / 2, height / 2 - 20);
+  text("Isabele", width / 2, height / 2 + 20);
+  text("Paulo", width / 2, height / 2 + 60);
+}
+
+void historia() {
+  background(planoDeFundo);
+  fill(255);
+  textSize(24);
+  textAlign(CENTER, CENTER);
+  text("História", width / 2, height / 2 - 100);
+  text("No ano 3021, a galáxia está sob ataque de uma frota de asteroides.", width / 2, height / 2 - 60);
+  text("Você é o último piloto sobrevivente de uma força de defesa espacial.", width / 2, height / 2 - 20);
+  text("Sua missão é destruir os asteroides e proteger a galáxia.", width / 2, height / 2 + 20);
+  text("Prepare-se para a batalha e boa sorte, piloto!", width / 2, height / 2 + 60);
 }
 
 void historiaButton() {
@@ -150,6 +208,8 @@ void historiaButton() {
   historiaButton.hide();
   voltarButton.setPosition(width/2 - 75, height/2 + 240);
   voltarButton.show();
+  nave1Button.hide();
+  nave2Button.hide();
 }
 
 void voltarButton() {
@@ -160,6 +220,8 @@ void voltarButton() {
   historiaButton.show();
   voltarButton.hide();
   restartButton.hide();
+  nave1Button.show();
+  nave2Button.show();
 }
 
 void iniciarJogo() {
@@ -173,6 +235,16 @@ void iniciarJogo() {
   historiaButton.hide();
   voltarButton.hide();
   restartButton.hide();
+  nave1Button.hide();
+  nave2Button.hide();
+}
+
+void nave1Button() {
+  naveSelecionada = nave1;
+}
+
+void nave2Button() {
+  naveSelecionada = nave2;
 }
 
 void jogo() {
@@ -188,7 +260,7 @@ void jogo() {
 }
 
 void desenharNave() {
-  image(nave, naveX, naveY, larguraNave, alturaNave);
+  image(naveSelecionada, naveX, naveY, larguraNave, alturaNave);
 }
 
 void atualizarNave() {
@@ -243,15 +315,8 @@ void desenharAsteroides() {
   for (int i = listaAsteroides.size() - 1; i >= 0; i--) {
     Asteroide asteroide = listaAsteroides.get(i);
     asteroide.mover();
-    int indexAsteroides = nivelDificuldade - 1;
-    if (indexAsteroides >= 0 && indexAsteroides < asteroides.length) {
-      image(asteroides[indexAsteroides], asteroide.posX, asteroide.posY, 50, 50);
-    }
-  }
-  
-  for (int i = listaAsteroides.size() - 1; i >= 0; i--) {
-    Asteroide asteroide = listaAsteroides.get(i);
-    if (asteroide.posX < -50) {
+    image(asteroides[int(random(0, 3))], asteroide.x, asteroide.y, 40, 40);
+    if (asteroide.x < 0) {
       listaAsteroides.remove(i);
     }
   }
@@ -260,148 +325,87 @@ void desenharAsteroides() {
 void verificarColisao() {
   for (int i = listaAsteroides.size() - 1; i >= 0; i--) {
     Asteroide asteroide = listaAsteroides.get(i);
-    for (int j = lasers.size() - 1; j >= 0; j--) {
-      Laser laser = lasers.get(j);
-      if (laser.x < asteroide.posX + 50 && laser.x + 10 > asteroide.posX &&
-          laser.y < asteroide.posY + 50 && laser.y + 10 > asteroide.posY) {
-        listaAsteroides.remove(i);
-        lasers.remove(j);
-        pontuacao += 10;
-      }
-    }
-    if (naveX < asteroide.posX + 50 && naveX + larguraNave > asteroide.posX &&
-        naveY < asteroide.posY + 50 && naveY + alturaNave > asteroide.posY) {
-      listaAsteroides.remove(i);
+    if (dist(naveX, naveY, asteroide.x, asteroide.y) < 25) {
       vidas--;
       somPerder.play();
-      if (vidas == 0) {
-        gameOver();
+      listaAsteroides.remove(i);
+      if (vidas <= 0) {
+        tela = 5;
+        startButton.hide();
+        creditosButton.hide();
+        instrucoesButton.hide();
+        historiaButton.hide();
+        restartButton.show();
+      }
+    }
+    for (int j = lasers.size() - 1; j >= 0; j--) {
+      Laser laser = lasers.get(j);
+      if (dist(laser.x, laser.y, asteroide.x, asteroide.y) < 20) {
+        pontuacao += 10;
+        image(explosao, asteroide.x, asteroide.y, 40, 40);
+        listaAsteroides.remove(i);
+        lasers.remove(j);
+        break;
       }
     }
   }
-}
-
-void verificarPontuacao() {
-  if (pontuacao >= 50 && nivelDificuldade == 1) {
-    nivelDificuldade = 2;
-    velocidadeAsteroide = 20;
-  } else if (pontuacao >= 120 && nivelDificuldade == 2) {
-    nivelDificuldade = 3;
-    velocidadeAsteroide = 25;
-  }
-}
-
-void gameOver() {
-  tela = 5;
-  background(0);
-  fill(255);
-  textSize(32);
-  textAlign(CENTER, CENTER);
-  text("Game Over", width/2, height/2 - 50);
-  text("Pontuação: " + pontuacao, width/2, height/2);
-  restartButton.show();
 }
 
 void desenharPontuacao() {
   fill(255);
-  textSize(16);
-  textAlign(LEFT);
-  text("Pontuação: " + pontuacao, 10, 20);
+  textSize(24);
+  text("Pontuação: " + pontuacao, 10, 25);
 }
 
 void desenharVidas() {
   fill(255);
-  textSize(16);
-  textAlign(RIGHT);
-  text("Vidas: " + vidas, width - 10, 20);
+  textSize(24);
+  text("Vidas: " + vidas, 10, 50);
 }
 
-void instrucoes() {
-  background(corFundo);
-  fill(255);
-  textSize(24);
-  textAlign(CENTER, CENTER);
-  text("Instruções", width/2, height/2 - 100);
-  textSize(16);
-  text("Use as setas do teclado para mover a nave", width/2, height/2 - 50);
-  text("Pressione a barra de espaço para disparar o laser", width/2, height/2);
-  text("Destrua os asteroides para ganhar pontos", width/2, height/2 + 50);
-  text("Evite colidir com os asteroides para não perder vidas", width/2, height/2 + 100);
-  text("Quando fizer 50 pontos a velociade aumenta e ao chegar em 100 pontos, aumenta mais um pouco", width/2, height/2 + 150);
+void verificarPontuacao() {
+  if (pontuacao >= 100) {
+    nivelDificuldade++;
+    pontuacao = 0;
+    velocidadeAsteroide++;
+    vidas = 3;
+    listaAsteroides.clear();
+    lasers.clear();
+  }
 }
 
-void creditos() {
-  background(corFundo);
-  fill(255);
-  textSize(24);
+void gameOver() {
+  background(0);
+  fill(255, 0, 0);
+  textSize(48);
   textAlign(CENTER, CENTER);
-  text("Créditos", width/2, height/2 - 100);
-  textSize(16);
-  text("Desenvolvido por:", width/2, height/2 - 50);
-  text("Beatriz Tayna", width/2, height/2);
-  text("Dieuphenson Jean", width/2, height/2 + 50);
-  text("Isabele Lorena", width/2, height/2 + 100);
-  text("Paulo Sergio", width/2, height/2 + 150);
-
- 
-}
-
-void historia() {
-  background(corFundo);
-  fill(255);
-  textSize(24);
-  textAlign(CENTER, CENTER);
-  text("História", width/2, height/2 - 100);
-  textSize(16);
-  text("Em um futuro distante, a Terra está sob ataque constante", width/2, height/2 - 50);
-  text("de asteroides. Você, como o piloto da nave estelar", width/2, height/2);
-  text("mais avançada, é a última esperança para proteger", width/2, height/2 + 50);
-  text("nosso planeta. Sua missão é destruir todos os asteroides e planetas intrusos", width/2,height/2 + 100);
-  text("antes que eles atinjam a Terra. Boa sorte, piloto!", width/2, height/2 + 150);
+  text("Game Over", width/2, height/2);
+  restartButton.show();
+  voltarButton.show();
+  nave1Button.show();
+  nave2Button.show();
 }
 
 void restartButton() {
   iniciarJogo();
 }
 
-void keyPressed() {
-  if (key == ' ' && tela == 0) {
-    iniciarJogo();
-  }
-  if (key == ' ' && tela == 2) {
-    tela = 0;
-        startButton.show();
-    creditosButton.show();
-    instrucoesButton.show();
-    historiaButton.show();
-  }
-  if (key == ' ' && tela == 4) {
-    tela = 0;
-    startButton.show();
-    creditosButton.show();
-    instrucoesButton.show();
-    historiaButton.show();
-  }
-}
-
 class Asteroide {
-  float posX, posY;
-  float velocidade;
+  float x, y, velocidade;
 
-  Asteroide(float x, float y, float vel) {
-    posX = x;
-    posY = y;
-    velocidade = vel;
+  Asteroide(float x, float y, float velocidade) {
+    this.x = x;
+    this.y = y;
+    this.velocidade = velocidade;
   }
 
   void mover() {
-    posX -= velocidade;
+    x -= velocidade;
   }
 }
 
 class Laser {
   float x, y;
-  float velocidade = 10;
 
   Laser(float x, float y) {
     this.x = x;
@@ -409,6 +413,6 @@ class Laser {
   }
 
   void mover() {
-    x += velocidade;
+    x += 5;
   }
 }
